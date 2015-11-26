@@ -20,7 +20,8 @@ the location of the brush. The console output will display the coordinates of th
 Note that the x coordinate will probably be inverted, depending on the way your video
 input is given. X and Y coordinates will also be mapped to an arbitrary scale, depending on the video input.
 
-If the pointer is not found, getPos will return (0, 0) to avoid unwanted errors
+If the pointer is not found, getPos will return (0, 0) to avoid unwanted errors. Note that errors in grabbing frames 
+from the video input are ignored.
 
 See example:
 
