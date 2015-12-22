@@ -40,13 +40,19 @@ Sample usage can be seen at:
 #AirBrush as a mouse
 AirBrush can also be launched by itself to use as a mouse. To launch, you can use the commands:
 >AirBrush.py
+
 >AirBrush.py -a
+
 >AirBrush.py -d
+
 >AirBrush.py -v
 
 The argument:
+
 	-a 	prints the position of the pointer to the console and displays the video input with detected points
+
 	-d  prints the position of the pointer to the console
+
 	-v  displays the video input with detected points
 
 Holding the brush relatively still for 3 or more seconds sends a mouse click.
