@@ -2,6 +2,9 @@
 #github.com/aneeshdurg/AirBrush
 import cv2
 import numpy as np
+import pyautogui
+import sys
+import time
 class brush:
 	#Video capture object
 	cap = None
@@ -49,3 +52,45 @@ class brush:
 			x, y = 0, 0
 			
 		return x, y	
+if __name__ == "__main__":
+	controller = brush(cv2.VideoCapture(0))
+	start = 0
+	end = 0
+	timer = False
+	prevx, prevy = 0, 0
+
+	debug = False
+	show = False
+	for i in range(1, len(sys.argv)):
+		arg = sys.argv[i]
+		if arg == '-a':
+			debug = True
+			show = True
+			break
+		elif arg == '-d':
+			debug = True
+		elif arg == '-v':
+			show = True	
+	
+	while True:
+		x, y = controller.getPos(show, debug)
+		if not timer:
+			start = time.time()
+			timer = True
+		try:
+			pyautogui.moveTo(1920 - 3*x, 2*y)
+		except:
+			pass
+		if abs(x-prevx) < 10 and abs(y-prevy) < 10:
+			end = time.time()
+			if end-start >= 3:
+				try:
+					pyautogui.click(1920 - 3*x,2*y)
+				except:
+					pass
+				timer = False
+		else:
+			timer = False
+			start = 0
+		prevx = x
+		prevy = y
