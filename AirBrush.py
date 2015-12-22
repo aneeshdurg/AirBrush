@@ -53,6 +53,7 @@ class brush:
 			
 		return x, y	
 if __name__ == "__main__":
+	pyautogui.FAILSAFE = False
 	controller = brush(cv2.VideoCapture(0))
 	start = 0
 	end = 0
@@ -77,17 +78,13 @@ if __name__ == "__main__":
 		if not timer:
 			start = time.time()
 			timer = True
-		try:
-			pyautogui.moveTo(1920 - 3*x, 2*y)
-		except:
-			pass
+
+		pyautogui.moveTo(1920 - 3*x, 2*y)
+
 		if abs(x-prevx) < 10 and abs(y-prevy) < 10:
 			end = time.time()
 			if end-start >= 3:
-				try:
-					pyautogui.click(1920 - 3*x,2*y)
-				except:
-					pass
+				pyautogui.click(1920 - 3*x,2*y)
 				timer = False
 		else:
 			timer = False
