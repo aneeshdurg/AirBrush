@@ -1,7 +1,7 @@
 # AirBrush as an importable class
 Class to get coordinates from an airbrush
 
-Requires OpenCV2, numpy, pyautogui
+Requires OpenCV2, numpy
 
 To use, import the class. See example:
 
@@ -11,7 +11,7 @@ Must be instantiated with a cv2 VideoCapture object. See example:
 
 >cap = cv2.VideoCapture(0)
 
->brush = AirBrush.brush(cap)
+>myBrush = AirBrush.brush(cap)
 
 x and y coordinates are obtained by the function getPos, which takes two booleans 
 as parameters. The first boolean is to show or surpress video output, the second
@@ -20,14 +20,14 @@ the location of the brush. The console output will display the coordinates of th
 Note that the x coordinate will probably be inverted, depending on the way your video
 input is given. X and Y coordinates will also be mapped to an arbitrary scale, depending on the video input.
 
-If the pointer is not found, getPos will return (0, 0) to avoid unwanted errors. Note that errors in grabbing frames 
-from the video input are ignored.
+If the pointer is not found, getPos will return (0, 0, False), otherwise returns (x, y, True) 
+Note that errors in grabbing frames from the video input are ignored.
 
 See example:
 
 >while True:
 
->     x, y = getPos(False, True)
+>     x, y, found = myBrush.getPos(False, True)
 
 For an example of a suitable AirBrush, see:
 
@@ -38,6 +38,9 @@ Sample usage can be seen at:
 	https://github.com/aneeshdurg/AirPaint
 
 #AirBrush as a mouse
+
+Requires OpenCV, numpy, PyAutoGUI
+
 AirBrush can also be launched by itself to use as a mouse. To launch, you can use the commands:
 >AirBrush.py
 

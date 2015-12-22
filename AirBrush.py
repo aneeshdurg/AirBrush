@@ -2,9 +2,6 @@
 #github.com/aneeshdurg/AirBrush
 import cv2
 import numpy as np
-import pyautogui
-import sys
-import time
 class brush:
 	#Video capture object
 	cap = None
@@ -46,13 +43,21 @@ class brush:
 			x =int(keypoints[0].pt[0])
 			y =int(keypoints[0].pt[1])
 
+		found = True
 		if len(keypoints)==0:
 			if debug:
 				print "Not found!"
 			x, y = 0, 0
-			
-		return x, y	
+			found = False
+
+		return x, y, found	
+
 if __name__ == "__main__":
+
+	import pyautogui
+	import sys
+	import time
+	
 	pyautogui.FAILSAFE = False
 	controller = brush(cv2.VideoCapture(0))
 	start = 0
@@ -74,12 +79,14 @@ if __name__ == "__main__":
 			show = True	
 	
 	while True:
-		x, y = controller.getPos(show, debug)
+		x, y, found = controller.getPos(show, debug)
+			
 		if not timer:
 			start = time.time()
 			timer = True
 
-		pyautogui.moveTo(1920 - 3*x, 2*y)
+		if found:
+			pyautogui.moveTo(1920 - 3*x, 2*y)
 
 		if abs(x-prevx) < 10 and abs(y-prevy) < 10:
 			end = time.time()
