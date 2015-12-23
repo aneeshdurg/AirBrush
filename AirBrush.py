@@ -2,16 +2,23 @@
 #github.com/aneeshdurg/AirBrush
 import cv2
 import numpy as np
+import math
 class brush:
 	#Video capture object
 	cap = None
-	x = 0
-	y = 0
+	prevx = None
+	prevy = None
 	
 	def __init__(Self, cap):
 		Self.cap = cap
+
+	def dist(Self, pt):
+		return math.sqrt(math.pow(pt[0]-Self.prevx, 2)+math.pow(pt[1]-Self.prevy, 2))	
 	
 	def getPos(Self, showScreen, debug):
+		if Self.prevx == None:
+			Self.prevx = Self.cap.get(3)/2
+			Self.prevy = Self.cap.get(4)/2
 		#get frame
 		_, frame = Self.cap.read()
 		#Converts frame to HSV
@@ -36,12 +43,6 @@ class brush:
 		if showScreen:
 			im_with_keypoints = cv2.drawKeypoints(frame, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 			cv2.imshow("Keypoints", im_with_keypoints)
-		#Stores position in x, y
-		for kpt in keypoints:
-			if debug:
-				print str(kpt.pt[0])+" "+str(kpt.pt[1])
-			x =int(keypoints[0].pt[0])
-			y =int(keypoints[0].pt[1])
 
 		found = True
 		if len(keypoints)==0:
@@ -49,7 +50,22 @@ class brush:
 				print "Not found!"
 			x, y = 0, 0
 			found = False
+			return x, y, found
 
+		#Stores position in x, y
+		low = 0
+		for i in range(1, len(keypoints)):
+			if dist(keypoints[low].pt) > dist(keypoints[i].pt):
+				low = i
+		
+		x =int(keypoints[low].pt[0])
+		y =int(keypoints[low].pt[1])
+
+		if debug:
+			print x+" "+y
+		
+		Self.prevx = x
+		Self.prevy = y
 		return x, y, found	
 
 if __name__ == "__main__":
@@ -98,3 +114,4 @@ if __name__ == "__main__":
 			start = 0
 		prevx = x
 		prevy = y
+		cv2.waitKey(30)
