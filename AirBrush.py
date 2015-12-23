@@ -8,13 +8,16 @@ class brush:
 	cap = None
 	prevx = None
 	prevy = None
-	
-	def __init__(Self, cap):
+	color = None
+
+	def __init__(Self, cap, B, G, R):
 		Self.cap = cap
+		color = np.uint8([[[B, G, R]]])
+		Self.color = cv2.cvtColor(color, cv2.COLOR_BGR2HSV)[0][0][0]
 
 	def dist(Self, pt):
-		return math.sqrt(math.pow(pt[0]-Self.prevx, 2)+math.pow(pt[1]-Self.prevy, 2))	
-	
+		return math.sqrt(math.pow(pt[0]-Self.prevx, 2)+math.pow(pt[1]-Self.prevy, 2))
+
 	def getPos(Self, showScreen, debug):
 		if Self.prevx == None:
 			Self.prevx = Self.cap.get(3)/2
@@ -24,8 +27,8 @@ class brush:
 		#Converts frame to HSV
 		hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 		#Lower and upper bounds for yellow
-		lower = np.array([20,20,20])
-		upper = np.array([45,255,255])
+		lower = np.array([Self.color-10,20,20])
+		upper = np.array([Self.color+10,255,255])
 		#Yellow mask (Grayscale)
 		mask = cv2.inRange(hsv, lower, upper)
 		res = cv2.bitwise_and(frame,frame, mask= mask)
@@ -55,7 +58,7 @@ class brush:
 		#Stores position in x, y
 		low = 0
 		for i in range(1, len(keypoints)):
-			if dist(keypoints[low].pt) > dist(keypoints[i].pt):
+			if Self.dist(keypoints[low].pt) > Self.dist(keypoints[i].pt):
 				low = i
 		
 		x =int(keypoints[low].pt[0])
@@ -74,26 +77,34 @@ if __name__ == "__main__":
 	import sys
 	import time
 	
-	pyautogui.FAILSAFE = False
-	controller = brush(cv2.VideoCapture(0))
-	start = 0
-	end = 0
-	timer = False
-	prevx, prevy = 0, 0
-
 	debug = False
 	show = False
+	changeColor = False
 	for i in range(1, len(sys.argv)):
 		arg = sys.argv[i]
 		if arg == '-a':
 			debug = True
 			show = True
-			break
 		elif arg == '-d':
 			debug = True
 		elif arg == '-v':
 			show = True	
+		elif arg == '-c':
+			b = int(raw_input("B: "))
+			g = int(raw_input("G: ")) 
+			r = int(raw_input("R: "))
+			changeColor = True
 	
+	pyautogui.FAILSAFE = False
+	if changeColor:
+		controller = brush(cv2.VideoCapture(0), b, g, r)
+	else:
+		controller = brush(cv2.VideoCapture(0), 0, 255, 255)	
+	start = 0
+	end = 0
+	timer = False
+	prevx, prevy = 0, 0
+
 	while True:
 		x, y, found = controller.getPos(show, debug)
 			
