@@ -9,11 +9,15 @@ class brush:
 	prevx = None
 	prevy = None
 	color = None
+	width = 0
+	height = 0
 
 	def __init__(Self, cap, B, G, R):
 		Self.cap = cap
 		color = np.uint8([[[B, G, R]]])
 		Self.color = cv2.cvtColor(color, cv2.COLOR_BGR2HSV)[0][0][0]
+		Self.width = cap.get(3)
+		Self.height = cap.get(4)
 
 	def dist(Self, pt):
 		return math.sqrt(math.pow(pt[0]-Self.prevx, 2)+math.pow(pt[1]-Self.prevy, 2))
@@ -45,6 +49,7 @@ class brush:
 		#Shows video with detected blobs
 		if showScreen:
 			im_with_keypoints = cv2.drawKeypoints(frame, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+			im_with_keypoints = cv2.flip(im_with_keypoints, 1)
 			cv2.imshow("Keypoints", im_with_keypoints)
 
 		found = True
@@ -77,6 +82,8 @@ if __name__ == "__main__":
 	import sys
 	import time
 	
+	size = [pyautogui.size()[0], pyautogui.size()[1]]
+
 	debug = False
 	show = False
 	changeColor = False
@@ -103,6 +110,7 @@ if __name__ == "__main__":
 	start = 0
 	end = 0
 	timer = False
+	hold = [False, False]
 	prevx, prevy = 0, 0
 
 	while True:
@@ -117,12 +125,31 @@ if __name__ == "__main__":
 
 		if abs(x-prevx) < 10 and abs(y-prevy) < 10:
 			end = time.time()
-			if end-start >= 3:
-				pyautogui.click(1920 - 3*x,2*y)
+			
+			screenX = size[1] - int(size[0]/controller.width)*x
+			screenY = int(size[1]/controller.height)*y
+
+			if end-start >= 3 and hold[0]:
 				timer = False
+				pyautogui.mouseDown(screenX, screenY, button='left')
+				hold[1] = True
+				hold[0] = False
+			
+			elif end-start >= 3 and hold[1]:
+				timer = False
+				pyautogui.mouseUp(screenX, screenY, button='left')
+				hold[1] = False	
+			
+			elif end-start >= 3:
+				pyautogui.click(screenX, screenY)
+				timer = False
+				hold[0] = True
+				hold[1] = False
 		else:
 			timer = False
 			start = 0
+		
 		prevx = x
 		prevy = y
+
 		cv2.waitKey(30)
