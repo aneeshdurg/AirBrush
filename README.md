@@ -17,8 +17,19 @@ x and y coordinates are obtained by the function getPos, which takes two boolean
 as parameters. The first boolean is to show or surpress video output, the second
 for console output. The video output will show the frames captued, highlighting
 the location of the brush. The console output will display the coordinates of the brush.
-Note that the x coordinate will probably be inverted, depending on the way your video
-input is given. X and Y coordinates will also be mapped to an arbitrary scale, depending on the video input.
+Note that the x coordinate will be inverted, depending on the way your video
+input is given. X and Y coordinates will also be mapped to the bounds of the frames obtained
+from the video input, which can be obtained as follows:
+
+>width(x-bound) = myBrush.width
+
+>height(y-bound) = myBrush.height
+
+The width and height instance variables are obatined by the cv2 functions:
+
+>cap.get(3)
+
+>cap.get(4)
 
 If the pointer is not found, getPos will return (0, 0, False), otherwise returns (x, y, True) 
 Note that errors in grabbing frames from the video input are ignored.
@@ -52,6 +63,10 @@ AirBrush can also be launched by itself to use as a mouse. To launch, you can us
 
 >AirBrush.py -c
 
+>AirBrush.py -m(duration)
+
+>AirBrush.py -m
+
 The argument:
 
 	-a 	prints the position of the pointer to the console and displays the video input with detected points.
@@ -60,9 +75,7 @@ The argument:
 
 	-v  displays the video input with detected points.
 
-	-c Allows to specify the BGR values of the color of the brush being detected.
-
-	   (Default is yellow)
+	-c Allows to specify the BGR values of the color of the brush being detected. Default is yellow.
 
 	-m(duration) sets the click duration to (duration). Default is 3s.
 
