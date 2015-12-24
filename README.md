@@ -54,15 +54,28 @@ AirBrush can also be launched by itself to use as a mouse. To launch, you can us
 
 The argument:
 
-	-a 	prints the position of the pointer to the console and displays the video input with detected points
+	-a 	prints the position of the pointer to the console and displays the video input with detected points.
 
-	-d  prints the position of the pointer to the console
+	-d  prints the position of the pointer to the console.
 
-	-v  displays the video input with detected points
+	-v  displays the video input with detected points.
 
 	-c Allows to specify the BGR values of the color of the brush being detected.
 
 	   (Default is yellow)
 
-Holding the brush relatively still for 3 or more seconds sends a mouse click.
-The video input is taken from the first availible webcam.
+	-m(duration) sets the click duration to (duration). Default is 3s.
+
+	-m Prompts for click duration. Default is 3s.   
+
+Holding the brush relatively still for 3 or more seconds sends a mouse left button click.
+
+Holding the brush still for a further 3 seconds presses the left mouse button down.
+
+Holding the brush still for a further 3 seconds afterwards releases the left mouse button.
+
+The video input is taken from the first availible webcam (device id = 0).
+
+TODO:
+
+	Implement right mouse button click.
