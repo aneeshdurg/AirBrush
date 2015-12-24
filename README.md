@@ -91,4 +91,4 @@ The video input is taken from the first availible webcam (device id = 0).
 
 TODO:
 
-	Implement right mouse button click.
+	Implement mouse right button click.
