@@ -77,18 +77,24 @@ class brush:
 		return x, y, found	
 
 if __name__ == "__main__":
-
+	#imports required only for mouse
 	import pyautogui
 	import sys
 	import time
-	
+	#variables
+	pyautogui.FAILSAFE = False
 	size = [pyautogui.size()[0], pyautogui.size()[1]]
-
-	click = 3
-
+	hold = [False, False]
+	start = 0
+	end = 0
+	timer = False
+	prevx, prevy = 0, 0
+	screenX, screenY = 0, 0
+	#variables modifiable by arguments
 	debug = False
 	show = False
 	changeColor = False
+	click = 3
 	for i in range(1, len(sys.argv)):
 		arg = sys.argv[i]
 		if arg == '-a':
@@ -108,55 +114,51 @@ if __name__ == "__main__":
 				click = int(arg[2:])
 			else:
 				click = int(raw_input("Click duration: "))	
-				
-	
-	pyautogui.FAILSAFE = False
+	#brush object				
 	if changeColor:
 		controller = brush(cv2.VideoCapture(0), b, g, r)
 	else:
 		controller = brush(cv2.VideoCapture(0), 0, 255, 255)	
-	start = 0
-	end = 0
-	timer = False
-	hold = [False, False]
-	prevx, prevy = 0, 0
-
+	#main loop
 	while True:
+		#Getting x y position of pointer
 		x, y, found = controller.getPos(show, debug)
-			
+		#timer for clicks	
 		if not timer:
 			start = time.time()
 			timer = True
-
+		#moves cursor	
 		if found:
-			pyautogui.moveTo(1920 - 3*x, 2*y)
-
-		if abs(x-prevx) < 10 and abs(y-prevy) < 10:
-			end = time.time()
-			
 			screenX = size[1] - int(size[0]/controller.width)*x
 			screenY = int(size[1]/controller.height)*y
-
+			pyautogui.moveTo(screenX, screenY)
+		#Clicking and draging	
+		if abs(x-prevx) < 10 and abs(y-prevy) < 10:
+			end = time.time()
+			#Press left button 
 			if end-start >= click and hold[0]:
 				timer = False
 				pyautogui.mouseDown(screenX, screenY, button='left')
 				hold[1] = True
 				hold[0] = False
-			
+			#Release left button
 			elif end-start >= click and hold[1]:
 				timer = False
 				pyautogui.mouseUp(screenX, screenY, button='left')
 				hold[1] = False	
-			
+			#Click left button
 			elif end-start >= click:
 				pyautogui.click(screenX, screenY)
 				timer = False
 				hold[0] = True
 				hold[1] = False
+		#If the timer's conditions are not satisfied, reset variables		
 		else:
 			timer = False
+			hold[0] = False
+			hold[1] = False
 			start = 0
-		
+		#Update previous values
 		prevx = x
 		prevy = y
 
