@@ -84,6 +84,8 @@ if __name__ == "__main__":
 	
 	size = [pyautogui.size()[0], pyautogui.size()[1]]
 
+	click = 3
+
 	debug = False
 	show = False
 	changeColor = False
@@ -101,6 +103,12 @@ if __name__ == "__main__":
 			g = int(raw_input("G: ")) 
 			r = int(raw_input("R: "))
 			changeColor = True
+		elif arg[:2] == '-m':
+			if len(arg) > 2:
+				click = int(arg[2:])
+			else:
+				click = int(raw_input("Click duration: "))	
+				
 	
 	pyautogui.FAILSAFE = False
 	if changeColor:
@@ -129,18 +137,18 @@ if __name__ == "__main__":
 			screenX = size[1] - int(size[0]/controller.width)*x
 			screenY = int(size[1]/controller.height)*y
 
-			if end-start >= 3 and hold[0]:
+			if end-start >= click and hold[0]:
 				timer = False
 				pyautogui.mouseDown(screenX, screenY, button='left')
 				hold[1] = True
 				hold[0] = False
 			
-			elif end-start >= 3 and hold[1]:
+			elif end-start >= click and hold[1]:
 				timer = False
 				pyautogui.mouseUp(screenX, screenY, button='left')
 				hold[1] = False	
 			
-			elif end-start >= 3:
+			elif end-start >= click:
 				pyautogui.click(screenX, screenY)
 				timer = False
 				hold[0] = True
