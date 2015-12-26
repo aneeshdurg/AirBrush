@@ -6,18 +6,46 @@ import math
 class brush:
 	#Video capture object
 	cap = None
+	frame = None
 	prevx = None
 	prevy = None
 	color = None
 	width = 0
 	height = 0
 
-	def __init__(Self, cap, B, G, R):
-		Self.cap = cap
+	def __init__(Self, **kwargs):
+		if 'B' not in kwargs:
+			B = 0
+		else:
+			B = kwargs['B']
+
+		if 'G' not in kwargs:
+			G = 255
+		else:
+			G = kwargs['G']
+
+		if 'R' not in kwargs:
+			R = 255
+		else:
+			R = kwargs['R']		
+
+		if 'cap' in kwargs:
+			Self.cap = kwargs['cap']
+		elif frame in kwargs:
+			Self.frame = cv2.imread(kwargs['frame'])
+			if Self.frame is None:
+				raise ValueError('Invalid file path!')
+		else:
+			raise ValueError('Incorrect arguments!')
+
 		color = np.uint8([[[B, G, R]]])
 		Self.color = cv2.cvtColor(color, cv2.COLOR_BGR2HSV)[0][0][0]
-		Self.width = cap.get(3)
-		Self.height = cap.get(4)
+		if 'cap' in kwargs:
+			Self.width = Self.cap.get(3)
+			Self.height = Self.cap.get(4)
+		else:
+			Self.width = Self.frame.shape[1]
+			Self.height = Self.frame.shape[0]	
 
 	def dist(Self, pt):
 		return math.sqrt(math.pow(pt[0]-Self.prevx, 2)+math.pow(pt[1]-Self.prevy, 2))
@@ -27,7 +55,10 @@ class brush:
 			Self.prevx = Self.cap.get(3)/2
 			Self.prevy = Self.cap.get(4)/2
 		#get frame
-		_, frame = Self.cap.read()
+		if Self.cap is not None:
+			_, frame = Self.cap.read()
+		else:
+			frame = Self.frame
 		#Converts frame to HSV
 		hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 		#Lower and upper bounds for yellow
@@ -70,7 +101,7 @@ class brush:
 		y =int(keypoints[low].pt[1])
 
 		if debug:
-			print x+" "+y
+			print str(x)+" "+str(y)
 		
 		Self.prevx = x
 		Self.prevy = y
@@ -116,9 +147,9 @@ if __name__ == "__main__":
 				click = int(raw_input("Click duration: "))	
 	#brush object				
 	if changeColor:
-		controller = brush(cv2.VideoCapture(0), b, g, r)
+		controller = brush(cap=cv2.VideoCapture(0), B=b, G=g, R=r)
 	else:
-		controller = brush(cv2.VideoCapture(0), 0, 255, 255)	
+		controller = brush(cap=cv2.VideoCapture(0))	
 	#main loop
 	while True:
 		#Getting x y position of pointer
@@ -129,7 +160,7 @@ if __name__ == "__main__":
 			timer = True
 		#moves cursor	
 		if found:
-			screenX = size[1] - int(size[0]/controller.width)*x
+			screenX = size[0] - int(size[0]/controller.width)*x
 			screenY = int(size[1]/controller.height)*y
 			pyautogui.moveTo(screenX, screenY)
 		#Clicking and draging	

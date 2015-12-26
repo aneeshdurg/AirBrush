@@ -11,15 +11,23 @@ Must be instantiated with a cv2 VideoCapture object. See example:
 
 >cap = cv2.VideoCapture(0)
 
->myBrush = AirBrush.brush(cap)
+>myBrush = AirBrush.brush(cap=cap)
+
+By default AirBrush searches for a yellow brush. To change the color of the brush set the 
+B, G, R values as follows:
+
+>myBrush = AirBrush.brush(cap=cap, B=<blue value>, G=<green value>, R=<red value>)
+
+To use an image instead of video input, use the following:
+
+>myBrush = AirBrush.brush(frame=frame)
 
 x and y coordinates are obtained by the function getPos, which takes two booleans 
 as parameters. The first boolean is to show or surpress video output, the second
 for console output. The video output will show the frames captued, highlighting
 the location of the brush. The console output will display the coordinates of the brush.
 Note that the x coordinate will be inverted, depending on the way your video
-input is given. X and Y coordinates will also be mapped to the bounds of the frames obtained
-from the video input, which can be obtained as follows:
+input is given. X and Y coordinates will also be mapped to the bounds of the frames obtained from the video input, which can be obtained as follows:
 
 >width(x-bound) = myBrush.width
 
