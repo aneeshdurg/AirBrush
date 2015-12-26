@@ -20,7 +20,7 @@ B, G, R values as follows:
 
 To use an image instead of video input, use the following:
 
->myBrush = AirBrush.brush(frame=frame)
+>myBrush = AirBrush.brush(frame="Path to image")
 
 x and y coordinates are obtained by the function getPos, which takes two booleans 
 as parameters. The first boolean is to show or surpress video output, the second
