@@ -32,7 +32,7 @@ class brush:
 		if 'cap' in kwargs:
 			Self.cap = kwargs['cap']
 		elif frame in kwargs:
-			Self.frame = cv2.imread(kwargs['frame'])
+			Self.frame = kwargs['frame']
 			if Self.frame is None:
 				raise ValueError('Invalid file path!')
 		else:
