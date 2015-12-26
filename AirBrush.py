@@ -31,7 +31,7 @@ class brush:
 
 		if 'cap' in kwargs:
 			Self.cap = kwargs['cap']
-		elif frame in kwargs:
+		elif 'frame' in kwargs:
 			Self.frame = kwargs['frame']
 			if Self.frame is None:
 				raise ValueError('Invalid file path!')
@@ -52,8 +52,8 @@ class brush:
 
 	def getPos(Self, showScreen, debug):
 		if Self.prevx == None:
-			Self.prevx = Self.cap.get(3)/2
-			Self.prevy = Self.cap.get(4)/2
+			Self.prevx = Self.width/2
+			Self.prevy = Self.height/2
 		#get frame
 		if Self.cap is not None:
 			_, frame = Self.cap.read()
@@ -82,7 +82,7 @@ class brush:
 			im_with_keypoints = cv2.drawKeypoints(frame, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 			im_with_keypoints = cv2.flip(im_with_keypoints, 1)
 			cv2.imshow("Keypoints", im_with_keypoints)
-
+			
 		found = True
 		if len(keypoints)==0:
 			if debug:
