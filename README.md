@@ -50,6 +50,10 @@ See example:
 
 >     x, y, found = myBrush.getPos(False, True)
 
+>	  pClick, sClick = myBrush.getClicked(click=c, dist=d)
+
+The function getClicked returns a tuple indicating whether the mouse has been still for c seconds (pClick) or 2*c seconds (sClick). [Note that before sClick is True, pClick will have turned True and then False.] where 'still' implies that the mouse has not moved more than d pixels. By default, c is 3 and d is 10.
+
 For an example of a suitable AirBrush, see:
 
 ![Brush](http://i.imgur.com/K6bKWJx.jpg "Brush")
@@ -77,6 +81,10 @@ AirBrush can also be launched by itself to use as a mouse. To launch, you can us
 
 >AirBrush.py -m
 
+>AirBrush.py -b(click Error Bound)
+
+>AirBrush.py -b
+
 The argument:
 
 	-a 	prints the position of the pointer to the console and displays the video input with detected points.
@@ -90,6 +98,11 @@ The argument:
 	-m(duration) sets the click duration to (duration). Default is 3s.
 
 	-m Prompts for click duration. Default is 3s.   
+
+	-b(Click error bound) sets the maximum distance the mouse can move while waiting for a click to (click error bound). Default is 10.
+
+	-b prompts for click error bound. Default is 10.
+
 
 Holding the brush relatively still for 3 or more seconds sends a mouse left button click.
 

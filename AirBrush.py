@@ -3,6 +3,7 @@
 import cv2
 import numpy as np
 import math
+import time
 class brush:
 	#Video capture object
 	cap = None
@@ -12,6 +13,12 @@ class brush:
 	color = None
 	width = 0
 	height = 0
+	pClick = False
+	sClick = False
+	clicked = False
+	timer = False
+	start = 0
+	end = 0
 
 	def __init__(Self, **kwargs):
 		if 'B' not in kwargs:
@@ -50,7 +57,39 @@ class brush:
 	def dist(Self, pt):
 		return math.sqrt(math.pow(pt[0]-Self.prevx, 2)+math.pow(pt[1]-Self.prevy, 2))
 
+	def getClicked(Self, click=3, dist=10):
+		x, y, found = Self.getPos(False, False)
+		if found:
+			if abs(x-Self.prevx) < dist and abs(y-Self.prevy) < dist:
+				Self.end = time.time()
+				#Secondary click 
+				if Self.end-Self.start >= click and Self.clicked:
+					Self.timer = False
+					Self.pClick = False
+					Self.sClick = True
+					Self.clicked = False
+				#primary click
+				elif Self.end-Self.start >= click:
+					Self.pClick = True
+					Self.sClick = False
+					Self.timer = False
+					Self.clicked = True
+			#If the timer's conditions are not satisfied, reset variables		
+			else:
+				Self.timer = False
+				Self.pClick = False
+				Self.sClick = False
+				Self.start = 0
+			return (Self.pClick, Self.sClick)	
+		else:
+			return (False, False)	
+
+
 	def getPos(Self, showScreen, debug):
+		if not Self.timer:
+			Self.start = time.time()
+			Self.timer = True
+		
 		if Self.prevx == None:
 			Self.prevx = Self.width/2
 			Self.prevy = Self.height/2
@@ -105,17 +144,21 @@ class brush:
 		
 		Self.prevx = x
 		Self.prevy = y
+		if not found:
+			Self.timer = False
+			Self.start = 0
+
 		return x, y, found	
 
 if __name__ == "__main__":
 	#imports required only for mouse
 	import pyautogui
 	import sys
-	import time
 	#variables
 	pyautogui.FAILSAFE = False
 	size = [pyautogui.size()[0], pyautogui.size()[1]]
-	hold = [False, False]
+	hold = False
+	pClick, sClick = False, False
 	start = 0
 	end = 0
 	timer = False
@@ -126,6 +169,7 @@ if __name__ == "__main__":
 	show = False
 	changeColor = False
 	click = 3
+	cDist = 10
 	for i in range(1, len(sys.argv)):
 		arg = sys.argv[i]
 		if arg == '-a':
@@ -145,6 +189,12 @@ if __name__ == "__main__":
 				click = int(arg[2:])
 			else:
 				click = int(raw_input("Click duration: "))	
+		elif arg[:2] = '-b':
+			if len(arg) > 2:
+				cDist = int(arg[2:])
+			else:
+				cDist = int(raw_input("Click error bound: "))	
+				
 	#brush object				
 	if changeColor:
 		controller = brush(cap=cv2.VideoCapture(0), B=b, G=g, R=r)
@@ -154,6 +204,15 @@ if __name__ == "__main__":
 	while True:
 		#Getting x y position of pointer
 		x, y, found = controller.getPos(show, debug)
+		pClick, sClick = False, False
+		if found:
+			pClick, sClick = controller.getClicked(click = click, dist = cDist)
+			if pClick:
+				print 'pClick'
+			if sClick:	
+				print 'sClick'
+		if not found:
+			print '-'*10
 		#timer for clicks	
 		if not timer:
 			start = time.time()
@@ -163,32 +222,14 @@ if __name__ == "__main__":
 			screenX = size[0] - int(size[0]/controller.width)*x
 			screenY = int(size[1]/controller.height)*y
 			pyautogui.moveTo(screenX, screenY)
-		#Clicking and draging	
-		if abs(x-prevx) < 10 and abs(y-prevy) < 10:
-			end = time.time()
-			#Press left button 
-			if end-start >= click and hold[0]:
-				timer = False
-				pyautogui.mouseDown(screenX, screenY, button='left')
-				hold[1] = True
-				hold[0] = False
-			#Release left button
-			elif end-start >= click and hold[1]:
-				timer = False
-				pyautogui.mouseUp(screenX, screenY, button='left')
-				hold[1] = False	
-			#Click left button
-			elif end-start >= click:
-				pyautogui.click(screenX, screenY)
-				timer = False
-				hold[0] = True
-				hold[1] = False
-		#If the timer's conditions are not satisfied, reset variables		
-		else:
-			timer = False
-			hold[0] = False
-			hold[1] = False
-			start = 0
+		
+		if pClick and not hold:
+			pyautogui.click(screenX, screenY)
+			hold = True	
+		elif sClick:
+			pyautogui.mouseDown(screenX, screenY)
+		elif pClick and hold:
+			pyautogui.mouseUp(screenX, screenY)	
 		#Update previous values
 		prevx = x
 		prevy = y
