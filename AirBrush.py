@@ -19,6 +19,7 @@ class brush:
 	timer = False
 	start = 0
 	end = 0
+	found = False
 
 	def __init__(Self, **kwargs):
 		if 'B' not in kwargs:
@@ -62,14 +63,14 @@ class brush:
 		dist = 10
 		x = None
 		y = None
-		found = True
+		
 
 		if 'click' in kwargs:
 			click = kwargs['click']
 		if 'dist' in kwargs:
 			dist = kwargs['dist']
 
-		if found:
+		if Self.found:
 			if Self.dist([Self.prevx[0], Self.prevy[0]]) < dist*math.sqrt(2):
 				Self.end = time.time()
 				#Secondary click 
@@ -137,13 +138,13 @@ class brush:
 			im_with_keypoints = cv2.flip(im_with_keypoints, 1)
 			cv2.imshow("Keypoints", im_with_keypoints)
 			
-		found = True
+		Self.found = True
 		if len(keypoints)==0:
 			if debug:
 				print "Not found!"
 			x, y = 0, 0
-			found = False
-			return x, y, found
+			Self.found = False
+			return x, y, Self.found
 
 		#Stores position in x, y
 		low = 0
@@ -162,12 +163,12 @@ class brush:
 
 		Self.prevx[1] = x
 		Self.prevy[1] = y
-		if not found:
+		if not Self.found:
 			Self.timer = False
 
 			Self.start = 0
 
-		return x, y, found	
+		return x, y, Self.found	
 
 if __name__ == "__main__":
 	#imports required only for mouse
