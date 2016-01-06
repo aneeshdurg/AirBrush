@@ -52,7 +52,7 @@ See example:
 
 >	  pClick, sClick = myBrush.getClicked(click=c, dist=d)
 
-The function getClicked returns a tuple indicating whether the mouse has been still for c seconds (pClick) or 2*c seconds (sClick). [Note that before sClick is True, pClick will have turned True and then False.] where 'still' implies that the mouse has not moved more than d pixels. By default, c is 3 and d is 10.
+The function getClicked returns a tuple indicating whether the mouse has been still for c seconds (pClick) or 2*c seconds (sClick). [Note that before sClick is True, pClick will have turned True and then False.] where 'still' implies that the mouse has not moved more than d pixels. By default, c is 3 and d is 10. Note that getClicked must be used after getPos, as it needs getPos to update the previous x and y values to determine whether or note the Brush has remained still.
 
 For an example of a suitable AirBrush, see:
 

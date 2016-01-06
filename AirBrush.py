@@ -8,8 +8,8 @@ class brush:
 	#Video capture object
 	cap = None
 	frame = None
-	prevx = None
-	prevy = None
+	prevx = [None, None]
+	prevy = [None, None]
 	color = None
 	width = 0
 	height = 0
@@ -55,12 +55,22 @@ class brush:
 			Self.height = Self.frame.shape[0]	
 
 	def dist(Self, pt):
-		return math.sqrt(math.pow(pt[0]-Self.prevx, 2)+math.pow(pt[1]-Self.prevy, 2))
+		return math.sqrt(math.pow(pt[0]-Self.prevx[1], 2)+math.pow(pt[1]-Self.prevy[1], 2))
 
-	def getClicked(Self, click=3, dist=10):
-		x, y, found = Self.getPos(False, False)
+	def getClicked(Self, **kwargs):
+		click = 3
+		dist = 10
+		x = None
+		y = None
+		found = True
+
+		if 'click' in kwargs:
+			click = kwargs['click']
+		if 'dist' in kwargs:
+			dist = kwargs['dist']
+
 		if found:
-			if abs(x-Self.prevx) < dist and abs(y-Self.prevy) < dist:
+			if Self.dist([Self.prevx[0], Self.prevy[0]]) < dist*math.sqrt(2):
 				Self.end = time.time()
 				#Secondary click 
 				if Self.end-Self.start >= click and Self.clicked:
@@ -73,13 +83,18 @@ class brush:
 					Self.pClick = True
 					Self.sClick = False
 					Self.timer = False
-					Self.clicked = True
-			#If the timer's conditions are not satisfied, reset variables		
+					Self.clicked = True	
+				#pointer hasn't moved, but time not satisfied
+				else:
+					Self.pClick = False
+					Self.sClick = False
+			#If the pointer's conditions are not satisfied, reset variables		
 			else:
 				Self.timer = False
 				Self.pClick = False
 				Self.sClick = False
-				Self.start = 0
+				Self.clicked = False
+
 			return (Self.pClick, Self.sClick)	
 		else:
 			return (False, False)	
@@ -90,9 +105,9 @@ class brush:
 			Self.start = time.time()
 			Self.timer = True
 		
-		if Self.prevx == None:
-			Self.prevx = Self.width/2
-			Self.prevy = Self.height/2
+		if Self.prevx[1] == None:
+			Self.prevx[1] = Self.width/2
+			Self.prevy[1] = Self.height/2
 		#get frame
 		if Self.cap is not None:
 			_, frame = Self.cap.read()
@@ -142,10 +157,14 @@ class brush:
 		if debug:
 			print str(x)+" "+str(y)
 		
-		Self.prevx = x
-		Self.prevy = y
+		Self.prevx[0] = Self.prevx[1]
+		Self.prevy[0] = Self.prevy[1]
+
+		Self.prevx[1] = x
+		Self.prevy[1] = y
 		if not found:
 			Self.timer = False
+
 			Self.start = 0
 
 		return x, y, found	
@@ -189,7 +208,7 @@ if __name__ == "__main__":
 				click = int(arg[2:])
 			else:
 				click = int(raw_input("Click duration: "))	
-		elif arg[:2] = '-b':
+		elif arg[:2] == '-b':
 			if len(arg) > 2:
 				cDist = int(arg[2:])
 			else:
@@ -207,16 +226,11 @@ if __name__ == "__main__":
 		pClick, sClick = False, False
 		if found:
 			pClick, sClick = controller.getClicked(click = click, dist = cDist)
-			if pClick:
-				print 'pClick'
-			if sClick:	
-				print 'sClick'
-		if not found:
-			print '-'*10
-		#timer for clicks	
-		if not timer:
-			start = time.time()
-			timer = True
+			if debug:
+				if pClick:
+					print 'pClick'
+				if sClick:	
+					print 'sClick'
 		#moves cursor	
 		if found:
 			screenX = size[0] - int(size[0]/controller.width)*x
@@ -225,11 +239,12 @@ if __name__ == "__main__":
 		
 		if pClick and not hold:
 			pyautogui.click(screenX, screenY)
-			hold = True	
 		elif sClick:
 			pyautogui.mouseDown(screenX, screenY)
+			hold = True	
 		elif pClick and hold:
-			pyautogui.mouseUp(screenX, screenY)	
+			pyautogui.mouseUp(screenX, screenY)
+			hold = False	
 		#Update previous values
 		prevx = x
 		prevy = y
