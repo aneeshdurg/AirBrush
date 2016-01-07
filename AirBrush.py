@@ -137,6 +137,7 @@ class brush:
 			im_with_keypoints = cv2.drawKeypoints(frame, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 			im_with_keypoints = cv2.flip(im_with_keypoints, 1)
 			cv2.imshow("Keypoints", im_with_keypoints)
+			cv2.imshow('res', res)
 			
 		Self.found = True
 		if len(keypoints)==0:
