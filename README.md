@@ -62,7 +62,7 @@ Sample usage can be seen at:
 	
 	https://github.com/aneeshdurg/AirPaint
 
-#AirBrush as a mouse
+# AirBrush as a mouse
 
 Requires OpenCV, numpy, PyAutoGUI
 
